@@ -199,3 +199,10 @@ tfoot {
 		page-break-after: always;
 	}
 }
+
+
+
+/* Custom css */
+.border-bottom{
+	border-bottom: 0.24em solid black;
+}

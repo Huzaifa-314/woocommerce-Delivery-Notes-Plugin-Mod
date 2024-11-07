@@ -139,6 +139,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 </div><!-- .order-addresses -->
 
 <div class="order-info">
+	<h2 class="border-bottom"><?php echo 'Delivery Note'; ?></h2>
 	<ul class="info-list">
 		<?php
 		$fields = apply_filters( 'wcdn_order_info_fields', wcdn_get_order_info( $order, 'deliverynote' ), $order );

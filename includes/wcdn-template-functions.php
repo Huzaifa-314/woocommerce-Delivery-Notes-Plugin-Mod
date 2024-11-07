@@ -947,7 +947,7 @@ function get_product_name( $product, $order, $item ) {
 								}
 							}
 						}
-						echo '<br>' . wp_kses_post( $key . ':' . $value );
+						echo '<br><br>' . wp_kses_post( $key . ':' . $value );
 					}
 				}
 			}
