@@ -109,29 +109,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h3 class="cap">
 				<?php esc_attr_e( $slabel, 'woocommerce-delivery-notes' );  // phpcs:ignore ?>
 			</h3>
-			<address>
+			<address class="profile-based-shipping-address">
 				<?php
-				if ( ! $order->get_formatted_shipping_address() ) {
-					esc_attr_e( 'N/A', 'woocommerce-delivery-notes' );
-				} else {
-					echo wp_kses_post( apply_filters( 'wcdn_address_shipping', $order->get_formatted_shipping_address(), $order ) );
-					$wdn_order_billing_id    = ( version_compare( get_option( 'woocommerce_version' ), '3.0.0', '>=' ) ) ? $order->get_billing_email() : $order->billing_email;
-					$wdn_order_billing_phone = ( version_compare( get_option( 'woocommerce_version' ), '3.0.0', '>=' ) ) ? $order->get_billing_phone() : $order->billing_phone;
-					if ( $wdn_order_billing_phone ) {
-						if ( isset( $data['phone_number']['active'] ) ) {
-							echo '<br>';
-							echo $wdn_order_billing_phone; // phpcs:ignore
+					if ( ! $order->get_formatted_shipping_address() ) {
+						esc_attr_e( 'N/A', 'woocommerce-delivery-notes' );
+					} else {
+						echo wp_kses_post( apply_filters( 'wcdn_address_shipping', $order->get_formatted_shipping_address(), $order ) );
+						$wdn_order_billing_id    = ( version_compare( get_option( 'woocommerce_version' ), '3.0.0', '>=' ) ) ? $order->get_billing_email() : $order->billing_email;
+						$wdn_order_billing_phone = ( version_compare( get_option( 'woocommerce_version' ), '3.0.0', '>=' ) ) ? $order->get_billing_phone() : $order->billing_phone;
+						if ( $wdn_order_billing_phone ) {
+							if ( isset( $data['phone_number']['active'] ) ) {
+								echo '<br>';
+								echo $wdn_order_billing_phone; // phpcs:ignore
+							}
+						}
+						if ( $wdn_order_billing_id ) {
+							if ( isset( $data['email_address']['active'] ) ) {
+								echo '<br>';
+								echo $wdn_order_billing_id; // phpcs:ignore
+							}
 						}
 					}
-					if ( $wdn_order_billing_id ) {
-						if ( isset( $data['email_address']['active'] ) ) {
-							echo '<br>';
-							echo $wdn_order_billing_id; // phpcs:ignore
-						}
-					}
-				}
 				?>
 			</address>
+            <address class="show-on-custom-shipping-address" style="display:none;">
+            	Please Check the Shipping Information below.
+            </address>
 		</div>
 	<?php endif; ?>	
 
@@ -190,7 +193,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<tbody>
 			<?php
-
 			if ( count( $order->get_items() ) > 0 ) :
 				?>
 				<?php foreach ( $order->get_items() as $item_id => $item ) : ?>
@@ -207,6 +209,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 					?>
 					<tr>
 						<td class="product-name">
+                       
+                        	<?php 
+                            if(has_custom_shipment_address($item)){
+                            	?>
+                                	<style>
+                                    	.profile-based-shipping-address{display:none;}
+                                        .show-on-custom-shipping-address{
+                                        display:block !important;}
+                                    </style>
+                                <?php
+                            }
+                            ?>
 							<?php do_action( 'wcdn_order_item_before', $product, $order, $item ); ?>
 							<?php get_product_name( $product, $order, $item ); ?>
 							<?php do_action( 'wcdn_order_item_after', $product, $order, $item ); ?>
@@ -325,4 +339,3 @@ if ( isset( $data['customer_note']['active'] ) ) :
 
 	<?php do_action( 'wcdn_after_colophon', $order ); ?>
 </div><!-- .order-colophon -->
-	

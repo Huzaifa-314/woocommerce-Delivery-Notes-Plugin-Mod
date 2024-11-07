@@ -883,6 +883,60 @@ add_filter( 'woocommerce_get_item_count', 'wcdn_order_item_count', 20, 3 );
  * @param WC_Order $order Order object.
  * @param object   $item Item Type.
  */
+ 
+function print_wsf_submit_table_data() {
+    global $wpdb;
+    
+    // Define the table name, assuming 'wsf_submit' is the name of the table
+    $table_name = $wpdb->prefix . 'wsf_submit';
+    
+    // Query to get all rows from the wsf_submit table
+    $results = $wpdb->get_results( "SELECT * FROM $table_name" );
+
+    // Check if any results were found
+    if ( ! empty( $results ) ) {
+        echo '<table border="1" cellpadding="5" cellspacing="0">';
+        echo '<thead><tr>';
+        
+        // Output the table headers dynamically from the results' keys
+        foreach ( $results[0] as $column => $value ) {
+            echo '<th>' . esc_html( $column ) . '</th>';
+        }
+        
+        echo '</tr></thead><tbody>';
+        
+        // Loop through the results and output each row
+        foreach ( $results as $row ) {
+            echo '<tr>';
+            foreach ( $row as $column => $value ) {
+                echo '<td>' . esc_html( $value ) . '</td>';
+            }
+            echo '</tr>';
+        }
+        
+        echo '</tbody></table>';
+    } else {
+        echo 'No data found in the wsf_submit table.';
+    }
+}
+
+
+//this function checks is a item has custom shipping address related to it.
+//Custom shipping address means when use puts an address while ordering a product.
+//Default shipping address comes from user's profile
+function has_custom_shipment_address($item){
+	foreach ($item->get_meta_data() as $meta_data) {
+        if ($meta_data->key === '_wsf_submit_id') {
+            $submit_id = $meta_data->value;
+            $submit = wsf_submit_get_object($submit_id);
+            //field_19 in wsfrom is the "address 1" field and it is required if customer want to put a custom shipping address
+            $meta_value = wsf_submit_get_value($submit, 'field_19');
+            if(!$meta_value=='') return 1;
+            else return 0;
+        }
+    }
+}
+
 function get_product_name( $product, $order, $item ) {
 	echo '<div class="name">';
 	$addon_name  = $item->get_meta( '_wc_pao_addon_name', true );
@@ -935,6 +989,7 @@ function get_product_name( $product, $order, $item ) {
 			} else {
 				foreach ( $item_meta_fields as $key => $value ) {
 					if ( ! ( 0 === strpos( $key, '_' ) ) ) {
+                        
 						if ( is_array( $value ) ) {
 							continue;
 						}
@@ -947,7 +1002,7 @@ function get_product_name( $product, $order, $item ) {
 								}
 							}
 						}
-						echo '<br><br>' . wp_kses_post( $key . ':' . $value );
+						echo '<br><br>'. wp_kses_post( $key . ':' . $value );
 					}
 				}
 			}
